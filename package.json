@@ -1,0 +1,46 @@
+{
+  "name": "productionline-web",
+  "version": "1.0.0",
+  "description": "An extension of productionline, providing common web/UI build capabilities.",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/**/*.js | tap-spec && standard | snazzy --verbose"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coreybutler/productionline-web.git"
+  },
+  "keywords": [
+    "build",
+    "transpile",
+    "minify",
+    "munge",
+    "process",
+    "flow"
+  ],
+  "author": "Corey Butler <corey@coreybutler.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/coreybutler/productionline-web/issues"
+  },
+  "homepage": "https://github.com/coreybutler/productionline-web#readme",
+  "dependencies": {
+    "babel-core": "6.26.0",
+    "chalk": "^2.3.0",
+    "chokidar": "2.0.0",
+    "clean-css": "4.1.9",
+    "cliui": "4.0.0",
+    "fs-extra": "5.0.0",
+    "glob": "7.1.2",
+    "productionline": "1.0.9",
+    "shortbus": "1.2.8",
+    "uglify-js": "3.3.9"
+  },
+  "devDependencies": {
+    "snazzy": "7.0.0",
+    "standard": "11.0.0",
+    "standard-tap": "1.0.2",
+    "tap-spec": "4.1.1",
+    "tape": "4.9.0"
+  }
+}
