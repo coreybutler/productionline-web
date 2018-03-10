@@ -9,7 +9,7 @@
   },
   "author": "John Doe",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "productionline": "^1.0.0"
   }
 }
