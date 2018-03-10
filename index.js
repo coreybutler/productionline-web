@@ -14,11 +14,13 @@ class Builder extends ProductionLine {
     // Overwrite tasks with new runner
     this.tasks = new this.TaskRunner()
 
-    /**
-     * @cfg {string} sourcemapurl
-     * A standard footer to be applied to files. Defaults to blank.
-     */
-    this.SOURCEMAPURL = cfg.sourcemapurl || null
+    this.PRIVATE = {
+      /**
+       * @cfg {string} sourcemapurl
+       * A standard footer to be applied to files. Defaults to blank.
+       */
+      SOURCEMAPURL: cfg.sourcemapurl || null
+    }
 
     // Get the sourcemap root if it's in the package.
     if (this.PKG.hasOwnProperty('sourcemaps')) {
@@ -37,18 +39,13 @@ class Builder extends ProductionLine {
         ct++
       }
 
-      this.SOURCEMAPURL = sourcemapuri
+      this.PRIVATE.SOURCEMAPURL = sourcemapuri
     }
 
     let width = 15
 
     // Initialize tasks.
-    // delete this.prepareBuild // Clear the super method
-
-    // Object.defineProperty(this, 'prepareBuild', {
-    //   enumerable: false,
-    //   writable: true,
-    //   value:
+    // Rebuild this.prepareBuild // Clear the super method
     this.prepareBuild = () => {
       this.tasks.add('Preparing Build', next => {
         let ui = new this.Table()
@@ -83,13 +80,13 @@ class Builder extends ProductionLine {
           text: this.ASSETS.map(asset => path.join(this.SOURCE, asset)).join('\n')
         })
 
-        if (this.hasOwnProperty('SOURCEMAPURL') && this.SOURCEMAPURL !== null) {
+        if (this.hasOwnProperty('SOURCEMAPURL') && this.PRIVATE.SOURCEMAPURL !== null) {
           ui.div({
             text: chalk.bold('SourceMaps:'),
             width,
             padding: [1, 0, 0, 2]
           }, {
-            text: this.SOURCEMAPURL,
+            text: this.PRIVATE.SOURCEMAPURL,
             padding: [1, 0, 0, 0]
           })
         }
@@ -108,17 +105,16 @@ class Builder extends ProductionLine {
         next()
       })
     }
-    // })
 
     this.prepareBuild()
   }
 
   get sourcemapurl () {
-    return this.SOURCEMAPURL
+    return this.PRIVATE.SOURCEMAPURL
   }
 
   set sourcemapurl (value) {
-    this.SOURCEMAPURL = value
+    this.PRIVATE.SOURCEMAPURL = value
   }
 
   // transpile (filepath callback) {
