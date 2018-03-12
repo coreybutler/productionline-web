@@ -225,6 +225,19 @@ class Builder extends ProductionLine {
     })
   }
 
+  // Preserve header content during minification
+  applyHeader (code, type = 'js', preserveHeader = true) {
+    if (!this.HEADER) {
+      return code
+    }
+
+    if (preserveHeader && this.PRIVATE.SOURCEMAPURL !== null) {
+      code = `@preserve\n${code}`
+    }
+
+    super.applyHeader(code, type)
+  }
+
   /**
    * A standard build process. Most build processes will override/extend this,
    * but this will add the following tasks to the process:

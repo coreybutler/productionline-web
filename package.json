@@ -1,6 +1,6 @@
 {
   "name": "productionline-web",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An extension of productionline, providing common web/UI build capabilities.",
   "main": "index.js",
   "scripts": {
@@ -26,13 +26,13 @@
   "homepage": "https://github.com/coreybutler/productionline-web#readme",
   "dependencies": {
     "babel-core": "6.26.0",
-    "chalk": "^2.3.0",
+    "chalk": "^2.3.2",
     "chokidar": "2.0.0",
     "clean-css": "4.1.9",
     "cliui": "4.0.0",
     "fs-extra": "5.0.0",
     "glob": "7.1.2",
-    "productionline": "1.0.9",
+    "productionline": "1.0.10",
     "shortbus": "1.2.8",
     "uglify-js": "3.3.9"
   },
