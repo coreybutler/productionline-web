@@ -1,6 +1,6 @@
 {
   "name": "productionline-web",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "An extension of productionline, providing common web/UI build capabilities.",
   "main": "index.js",
   "scripts": {
