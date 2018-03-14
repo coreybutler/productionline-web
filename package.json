@@ -32,7 +32,7 @@
     "cliui": "4.0.0",
     "fs-extra": "5.0.0",
     "glob": "7.1.2",
-    "productionline": "1.0.10",
+    "productionline": "^1.1.1",
     "shortbus": "1.2.8",
     "uglify-js": "3.3.9"
   },
