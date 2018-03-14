@@ -252,7 +252,7 @@ class Builder extends ProductionLine {
   make () {
     this.clean()
     this.copyAssets()
-    this.buildHMTL()
+    this.buildHTML()
     this.buildJavaScript()
     this.buildCSS()
     this.run()
