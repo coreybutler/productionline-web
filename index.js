@@ -255,7 +255,6 @@ class Builder extends ProductionLine {
     this.buildHTML()
     this.buildJavaScript()
     this.buildCSS()
-    this.run()
   }
 }
 
