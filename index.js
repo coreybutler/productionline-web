@@ -1,7 +1,7 @@
 const localpackage = require('./package.json')
 const ProductionLine = require('productionline')
 const path = require('path')
-const babel = require('babel-core')
+const babel = require('@babel/core')
 const minifier = require('uglify-js')
 const CleanCSS = require('clean-css')
 const chalk = require('chalk')
@@ -19,7 +19,20 @@ class Builder extends ProductionLine {
        * @cfg {string} sourcemapurl
        * A standard footer to be applied to files. Defaults to blank.
        */
-      SOURCEMAPURL: cfg.sourcemapurl || null
+      SOURCEMAPURL: cfg.sourcemapurl || null,
+
+      /**
+       * @cfg {object} transpile
+       * Babel configuration. Defaults to:
+       * ```js
+       * {
+       *   presets: ["@babel/preset-env"]
+       * }
+       * ```
+       */
+      TRANSPILECFG: cfg.transpile || {
+        presets: ['@babel/preset-env']
+      }
     }
 
     // Get the sourcemap root if it's in the package.
@@ -117,6 +130,10 @@ class Builder extends ProductionLine {
     this.PRIVATE.SOURCEMAPURL = value
   }
 
+  get transpilerConfiguration () {
+    return this.PRIVATE.TRANSPILECFG
+  }
+
   // transpile (filepath callback) {
   //   fs.readFile(filepath, (err, content) => {
   //     callback(babel.transform(content, {
@@ -128,13 +145,21 @@ class Builder extends ProductionLine {
   /**
    * Synchronously transpile JavaScript code using Babel.
    * By default, this uses `presets: ['env']`.
-   * @param  {[type]} filepath [description]
-   * @return {[type]}          [description]
+   * @param  {string} filepath
+   * Path of the file to transpile.
+   * @param  {object} [transpilerConfiguration]
+   * Defaults to the #transpile configuration value.
+   * @return {object}
+   * Returns the transpiled code object.
+   * ```
+   * {
+   *   code: '...',
+   *   map: {}, // Sourcemap
+   *   ast: {} // AST tree
+   * }
    */
-  transpile (filepath) {
-    return babel.transform(fs.readFileSync(filepath).toString(), {
-      presets: ['env']
-    })
+  transpile (filepath, cfg = null) {
+    return babel.transform(fs.readFileSync(filepath).toString(), cfg || this.PRIVATE.TRANSPILECFG) // Generates {code, map, ast}
   }
 
   /**
@@ -148,10 +173,12 @@ class Builder extends ProductionLine {
       code = fs.readFileSync(code).toString()
     } catch (e) {}
 
-    return minifier.minify(code, {
+    let minified = minifier.minify(code, {
       mangle: true,
       compress: true
     })
+
+    return minified
   }
 
   /**
@@ -195,6 +222,7 @@ class Builder extends ProductionLine {
         transpiler.add(`Transpile ${this.localDirectory(filepath)}`, cont => {
           let transpiled = this.transpile(filepath)
           let minified = this.minify(transpiled.code)
+
           // console.log(transpiled.map)
           // console.log(transpiled.ast)
           let content = this.applyHeader(minified.code, 'js')
@@ -235,7 +263,7 @@ class Builder extends ProductionLine {
       code = `@preserve\n${code}`
     }
 
-    super.applyHeader(code, type)
+    return super.applyHeader(code, type)
   }
 
   /**
