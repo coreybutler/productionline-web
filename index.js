@@ -190,7 +190,7 @@ class Builder extends ProductionLine {
     cfg = cfg || this.PRIVATE.TRANSPILECFG
 
     cfg.sourceFileName = cfg.sourceFileName || path.basename(filepath)
-    cfg.sourceMaps = cfg.sourceMaps === false ? false : true
+    cfg.sourceMaps = cfg.sourceMaps === false ? false : true // eslint-disable-line
 
     return babel.transform(fs.readFileSync(filepath).toString(), cfg) // Generates {code, map, ast}
   }
@@ -236,7 +236,7 @@ class Builder extends ProductionLine {
           options.sourceMap.url = options.sourceMap.url.replace(match[0], match[0] + '/').replace(/\/{3,100}/i, '//')
         }
 
-        options.sourceMap.root = options.sourceMap.url.replace(this.PRIVATE.SOURCEMAPURL,  this.PRIVATE.SOURCEMAPURL + '/sources/')
+        options.sourceMap.root = options.sourceMap.url.replace(this.PRIVATE.SOURCEMAPURL, this.PRIVATE.SOURCEMAPURL + '/sources/')
 
         // delete options.sourceMap.root
       }
