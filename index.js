@@ -22,6 +22,19 @@ class Builder extends ProductionLine {
       SOURCEMAPURL: cfg.sourcemapurl || null,
 
       /**
+       * @cfg {string} sourcemapdir
+       * The directory (relative or absolute) where sourcemap files are written.
+       */
+      SOURCEMAPDIR: cfg.sourcemapdir || './SOURCEMAPS',
+
+      /**
+       * @cfg {array} ignoremaps
+       * An array of globs for ignoring source map creation.
+       * For example: `['/path/to/vendor_js/*.js']`
+       */
+      IGNOREDSOURCEMAPS: cfg.ignoremaps || [],
+
+      /**
        * @cfg {object} transpile
        * Babel configuration. Defaults to:
        * ```js
@@ -55,7 +68,7 @@ class Builder extends ProductionLine {
       this.PRIVATE.SOURCEMAPURL = sourcemapuri
     }
 
-    let width = 15
+    let width = 25
 
     // Initialize tasks.
     // Rebuild this.prepareBuild // Clear the super method
@@ -66,13 +79,13 @@ class Builder extends ProductionLine {
         ui.div({
           text: this.COLORS.info(`Running ${localpackage.name} v${localpackage.version} for ${this.PKG.name}`),
           border: false,
-          padding: [1, 0, 1, 2]
+          padding: [1, 0, 1, 5]
         })
 
         ui.div({
           text: chalk.bold('Source:'),
           width,
-          padding: [0, 0, 0, 2]
+          padding: [0, 0, 0, 5]
         }, {
           text: this.SOURCE
         })
@@ -80,7 +93,7 @@ class Builder extends ProductionLine {
         ui.div({
           text: chalk.bold('Output:'),
           width,
-          padding: [0, 0, 0, 2]
+          padding: [0, 0, 0, 5]
         }, {
           text: this.OUTPUT
         })
@@ -88,30 +101,41 @@ class Builder extends ProductionLine {
         ui.div({
           text: chalk.bold('Assets:'),
           width,
-          padding: [0, 0, 0, 2]
+          padding: [0, 0, 0, 5]
         }, {
           text: this.ASSETS.map(asset => path.join(this.SOURCE, asset)).join('\n')
         })
 
-        if (this.hasOwnProperty('SOURCEMAPURL') && this.PRIVATE.SOURCEMAPURL !== null) {
+        if (this.PRIVATE.hasOwnProperty('SOURCEMAPURL') && this.PRIVATE.SOURCEMAPURL !== null) {
           ui.div({
-            text: chalk.bold('SourceMaps:'),
+            text: chalk.bold('Source Maps:'),
             width,
-            padding: [1, 0, 0, 2]
+            padding: [0, 0, 0, 5]
           }, {
             text: this.PRIVATE.SOURCEMAPURL,
-            padding: [1, 0, 0, 0]
+            padding: [0, 0, 0, 0]
           })
         }
 
         ui.div({
           text: this.COLORS.subtle('Ignored:'),
           width,
-          padding: [1, 0, 1, 2]
+          padding: [1, 0, this.PRIVATE.IGNOREDSOURCEMAPS.length > 0 ? 0 : 1, 5]
         }, {
           text: this.COLORS.subtle(this.IGNOREDLIST.join(', ')),
-          padding: [1, 0, 1, 0]
+          padding: [1, 0, 0, 0]
         })
+
+        if (this.PRIVATE.IGNOREDSOURCEMAPS.length > 0) {
+          ui.div({
+            text: this.COLORS.subtle('Ignored SourceMaps:'),
+            width,
+            padding: [0, 0, 1, 5]
+          }, {
+            text: this.COLORS.subtle(this.PRIVATE.IGNOREDSOURCEMAPS.join(', ')),
+            padding: [0, 0, 1, 0]
+          })
+        }
 
         console.log(ui.toString())
 
@@ -132,6 +156,10 @@ class Builder extends ProductionLine {
 
   get transpilerConfiguration () {
     return this.PRIVATE.TRANSPILECFG
+  }
+
+  sourcemapDirectory (filepath) {
+    return path.dirname(path.join(this.OUTPUT, this.PRIVATE.SOURCEMAPDIR, this.localDirectory(filepath)))
   }
 
   // transpile (filepath callback) {
@@ -159,26 +187,62 @@ class Builder extends ProductionLine {
    * }
    */
   transpile (filepath, cfg = null) {
-    return babel.transform(fs.readFileSync(filepath).toString(), cfg || this.PRIVATE.TRANSPILECFG) // Generates {code, map, ast}
+    cfg = cfg || this.PRIVATE.TRANSPILECFG
+
+    cfg.sourceFileName = cfg.sourceFileName || path.basename(filepath)
+    cfg.sourceMaps = cfg.sourceMaps === false ? false : true
+
+    return babel.transform(fs.readFileSync(filepath).toString(), cfg) // Generates {code, map, ast}
   }
 
   /**
    * Minify JS code using UglifyJS.
    * @param  {string} code
    * This can be raw code or an input file.
-   * @return {[type]}      [description]
+   * @param {string} [sourcefilename]
+   * The name of the source file. This is required for sourcemaps.
+   * @param {object} [sourcemap]
+   * Apply a sourcemap to the minification.
+   * @return {object}
+   * ```
+   * {
+   *   code: '...',
+   *   map: {}, // Sourcemap
+   * }
+   * ```
    */
-  minify (code) {
+  minify (code, filename = null, sourcemap = null) {
     try {
       code = fs.readFileSync(code).toString()
     } catch (e) {}
 
-    let minified = minifier.minify(code, {
+    let options = {
       mangle: true,
       compress: true
-    })
+    }
 
-    return minified
+    if (filename !== null) {
+      options.sourceMap = {
+        root: this.PRIVATE.SOURCEMAPURL,
+        url: filename
+      }
+
+      if (sourcemap !== null) {
+        options.sourceMap.content = sourcemap
+        options.sourceMap.url = (this.PRIVATE.SOURCEMAPURL + '/' + filename + '.map').replace(/\/{2,10}/gi, '/')
+
+        if (options.sourceMap.url.startsWith('http')) {
+          let match = /https?:\/{1}/i.exec(options.sourceMap.url)
+          options.sourceMap.url = options.sourceMap.url.replace(match[0], match[0] + '/').replace(/\/{3,100}/i, '//')
+        }
+
+        options.sourceMap.root = options.sourceMap.url.replace(this.PRIVATE.SOURCEMAPURL,  this.PRIVATE.SOURCEMAPURL + '/sources/')
+
+        // delete options.sourceMap.root
+      }
+    }
+
+    return minifier.minify(code, options)
   }
 
   /**
@@ -214,18 +278,48 @@ class Builder extends ProductionLine {
     })
   }
 
-  buildJavaScript () {
+  buildJavaScript (transpile = true, minify = true, createsourcemaps = true) {
+    if (createsourcemaps && this.PRIVATE.SOURCEMAPURL === null) {
+      createsourcemaps = false
+    }
+
     this.tasks.add('Build JavaScript', next => {
       let transpiler = new this.TaskRunner()
 
       this.walk(path.join(this.SOURCE, '/**/*.js')).forEach(filepath => {
         transpiler.add(`Transpile ${this.localDirectory(filepath)}`, cont => {
-          let transpiled = this.transpile(filepath)
-          let minified = this.minify(transpiled.code)
+          // Handle transpilation
+          let transpiled = transpile ? this.transpile(filepath) : { code: fs.readFileSync(filepath), map: null }
 
-          // console.log(transpiled.map)
-          // console.log(transpiled.ast)
+          // Sourcemap configuration
+          let createmap = createsourcemaps
+
+          if (!createsourcemaps) {
+            transpiled.map = null
+          } else if (this.PRIVATE.IGNOREDSOURCEMAPS.length > 0) {
+            for (let i = 0; i < this.PRIVATE.IGNOREDSOURCEMAPS.length; i++) {
+              if (this.minimatch(filepath, path.join(this.SOURCE, this.PRIVATE.IGNOREDSOURCEMAPS[i]))) {
+                createmap = false
+                transpiled.map = null
+                this.warn('     - Skipped sourcemap creation for ' + this.localDirectory(filepath) + ' (EXPLICITLY IGNORED)')
+                break
+              }
+            }
+          }
+
+          // Handle minification
+          let minified = minify ? this.minify(transpiled.code, this.localDirectory(filepath), transpiled.map) : transpiled
+
+          // Apply comment header & footer
           let content = this.applyHeader(minified.code, 'js')
+          content = this.applyFooter(minified.code, 'js')
+
+          // Create sourcemaps
+          if (createmap && minified.map !== null) {
+            let mappath = path.join(this.sourcemapDirectory(filepath), path.basename(filepath) + '.map')
+            this.writeFileSync(mappath, minified.map)
+            this.subtle('     + SourceMap created:', this.localDirectory(mappath))
+          }
 
           this.writeFile(this.outputDirectory(filepath), content, cont)
         })
@@ -283,6 +377,10 @@ class Builder extends ProductionLine {
     this.buildHTML()
     this.buildJavaScript()
     this.buildCSS()
+  }
+
+  debug () {
+
   }
 }
 
