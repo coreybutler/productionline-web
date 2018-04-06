@@ -103,7 +103,7 @@ class Builder extends ProductionLine {
           width,
           padding: [0, 0, 0, 5]
         }, {
-          text: this.ASSETS.length === 0 ? this.COLORS.verysubtle('None') : this.ASSETS.map(asset => path.join(this.SOURCE, asset)).join('\n')
+          text: this.ASSETS.length === 0 ? this.COLORS.warn('None') : this.ASSETS.map(asset => path.join(this.SOURCE, asset)).join('\n')
         })
 
         if (this.PRIVATE.hasOwnProperty('SOURCEMAPURL') && this.PRIVATE.SOURCEMAPURL !== null) {
