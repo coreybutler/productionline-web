@@ -30,7 +30,7 @@
     "chalk": "2.3.2",
     "clean-css": "4.1.9",
     "fs-extra": "5.0.0",
-    "productionline": "^1.1.13",
+    "productionline": "^1.1.15",
     "source-map": "^0.7.2",
     "uglify-js": "3.3.9"
   },
