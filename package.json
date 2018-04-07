@@ -1,6 +1,6 @@
 {
   "name": "productionline-web",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "An extension of productionline, providing common web/UI build capabilities.",
   "main": "index.js",
   "scripts": {
@@ -30,7 +30,7 @@
     "chalk": "2.3.2",
     "clean-css": "4.1.9",
     "fs-extra": "5.0.0",
-    "productionline": "^1.1.20",
+    "productionline": "^1.1.21",
     "source-map": "^0.7.2",
     "uglify-js": "3.3.9"
   },
