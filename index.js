@@ -142,8 +142,6 @@ class Builder extends ProductionLine {
         next()
       })
     }
-
-    this.prepareBuild()
   }
 
   get sourceMapper () {
