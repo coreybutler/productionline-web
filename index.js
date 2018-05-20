@@ -255,12 +255,17 @@ class Builder extends ProductionLine {
     this.tasks.add(`Cleaning ${this.OUTPUT}`, next => fs.emptyDir(this.OUTPUT, next))
   }
 
-  copyAssets () {
+  // Setting verbose=true will log the path of each copy.
+  copyAssets (verbose = false) {
     this.tasks.add('Copy Assets', next => {
       let assetTasks = new this.TaskRunner()
 
       this.ASSETS.forEach(assetPath => {
         assetTasks.add(`Copying ${assetPath} to output.`, cont => {
+          if (verbose) {
+            console.log(this.COLORS.verysubtle(`     - Copy ${assetPath} to `) + this.COLORS.subtle(this.outputDirectory(assetPath)))
+          }
+
           this.copyToOutput(assetPath, cont)
         })
       })
