@@ -25,20 +25,20 @@
   },
   "homepage": "https://github.com/coreybutler/productionline-web#readme",
   "dependencies": {
-    "@babel/core": "7.0.0-beta.46",
-    "@babel/preset-env": "7.0.0-beta.46",
-    "chalk": "2.3.2",
-    "clean-css": "4.1.9",
-    "fs-extra": "5.0.0",
+    "@babel/core": "7.0.0-beta.54",
+    "@babel/preset-env": "7.0.0-beta.54",
+    "chalk": "2.4.1",
+    "clean-css": "4.1.11",
+    "fs-extra": "7.0.0",
     "productionline": "^1.2.10",
-    "source-map": "0.7.2",
-    "uglify-js": "3.3.9"
+    "source-map": "0.7.3",
+    "uglify-js": "3.4.5"
   },
   "devDependencies": {
-    "snazzy": "7.0.0",
-    "standard": "11.0.0",
-    "standard-tap": "1.0.2",
-    "tap-spec": "4.1.1",
-    "tape": "4.9.0"
+    "snazzy": "7.1.1",
+    "standard": "11.0.1",
+    "standard-tap": "1.0.4",
+    "tap-spec": "5.0.0",
+    "tape": "4.9.1"
   }
 }
