@@ -28,7 +28,7 @@
     "@babel/core": "7.0.0-beta.54",
     "@babel/preset-env": "7.0.0-beta.54",
     "chalk": "2.4.1",
-    "clean-css": "4.1.11",
+    "clean-css": "4.2.0",
     "fs-extra": "7.0.0",
     "productionline": "^1.2.10",
     "source-map": "0.7.3",
