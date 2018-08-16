@@ -1,7 +1,7 @@
 'use strict'
 
 const WebProductionLine = require('../')
-const test = require('tape')
+const test = require('tap').test
 
 test('Sanity Test', function (t) {
   let Builder = new WebProductionLine()
