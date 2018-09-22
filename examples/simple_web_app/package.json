@@ -10,6 +10,6 @@
   "author": "John Doe",
   "license": "MIT",
   "dependencies": {
-    "productionline": "^1.0.0"
+    "productionline": "^1.3.11"
   }
 }
